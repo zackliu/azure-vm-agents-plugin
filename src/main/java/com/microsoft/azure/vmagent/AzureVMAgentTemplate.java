@@ -245,6 +245,7 @@ public class AzureVMAgentTemplate implements Describable<AzureVMAgentTemplate>, 
             String osType,
             String imageTopLevelType,
             boolean imageReference,
+            String imageReferenceType,
             ImageReferenceTypeClass imageReferenceTypeClass,
             String agentLaunchMethod,
             boolean preInstallSsh,
@@ -285,7 +286,7 @@ public class AzureVMAgentTemplate implements Describable<AzureVMAgentTemplate>, 
         }
         setUsageMode(usageMode);
         this.imageTopLevelType = imageTopLevelType;
-        this.imageReferenceType = getImageReferenceType(imageReferenceTypeClass);
+        this.imageReferenceType = getImageReferenceType(imageReferenceType, imageReferenceTypeClass);
         this.builtInImage = builtInImage;
         this.isInstallDocker = isInstallDocker;
         this.isInstallGit = isInstallGit;
@@ -549,11 +550,15 @@ public class AzureVMAgentTemplate implements Describable<AzureVMAgentTemplate>, 
         return imageTopLevelType;
     }
 
-    public String getImageReferenceType(ImageReferenceTypeClass imageReferenceTypeClass) {
-        if (imageReferenceTypeClass.image != null) {
-            return "custom";
+    public String getImageReferenceType(String referenceType, ImageReferenceTypeClass imageReferenceTypeClass) {
+        if (StringUtils.isBlank(referenceType)) {
+            if (imageReferenceTypeClass.image != null) {
+                return "custom";
+            }
+            return "reference";
+        } else {
+            return referenceType.equals("custom") ? "custom" : "reference";
         }
-        return "reference";
     }
 
     public String getBuiltInImage() {
